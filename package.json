@@ -1,0 +1,24 @@
+{
+  "name": "wellness-buddy",
+  "version": "1.0.0",
+  "description": "Wellness Buddy is a mobile-first web app that empowers users to take control of their personal well-being by combining tools from four essential areas — health, finance, legal, and lifestyle — in one place.",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/0xbobby841/wellnessbuddy.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/0xbobby841/wellnessbuddy/issues"
+  },
+  "homepage": "https://github.com/0xbobby841/wellnessbuddy#readme"
+}

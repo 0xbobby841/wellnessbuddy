@@ -1,5 +1,20 @@
+# Node modules
 node_modules/
+
+# Root env
 .env
-.DS_Store
+
+# API envs
+api/.env
+
+# Client envs
+client/.env
+client/.env.local
+client/.env.*.local
+
+# Build artifacts
 dist/
 build/
+
+# macOS junk
+.DS_Store

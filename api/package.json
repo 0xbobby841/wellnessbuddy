@@ -12,10 +12,15 @@
   "license": "ISC",
   "type": "commonjs",
   "dependencies": {
+    "@aws-sdk/client-secrets-manager": "^3.948.0",
     "@supabase/supabase-js": "^2.84.0",
     "cors": "^2.8.5",
     "dotenv": "^17.2.3",
     "express": "^5.1.0",
-    "pg": "^8.16.3"
+    "pg": "^8.16.3",
+    "serverless-http": "^4.0.0"
+  },
+  "devDependencies": {
+    "serverless-offline": "^14.4.0"
   }
 }

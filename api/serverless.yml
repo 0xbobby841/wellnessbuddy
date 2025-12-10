@@ -24,7 +24,7 @@ provider:
         - Content-Type
         - Authorization
   environment:
-    SECRETS_ID: wellnessbuddy/api/prod
+    SECRETS_ID: WellnessBuddy/api/prod
   iam:
     role:
       statements:
@@ -32,7 +32,7 @@ provider:
           Action:
             - secretsmanager:GetSecretValue
           Resource:
-            - arn:aws:secretsmanager:${self:provider.region}:*:secret:wellnessbuddy/api/prod-*
+            - arn:aws:secretsmanager:${self:provider.region}:*:secret:WellnessBuddy/api/prod-*
 
 functions:
   api:

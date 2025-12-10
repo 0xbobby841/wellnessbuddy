@@ -1,0 +1,52 @@
+frameworkVersion: '4'
+
+service: wellness-buddy-api
+
+provider:
+  name: aws
+  runtime: nodejs20.x
+  region: us-east-1
+  memorySize: 512
+  timeout: 30
+  httpApi:
+    cors:
+      allowedOrigins:
+        - https://main.d28ajx45sg35zo.amplifyapp.com
+        - http://localhost:5173
+      allowedMethods:
+        - GET
+        - POST
+        - PUT
+        - PATCH
+        - DELETE
+        - OPTIONS
+      allowedHeaders:
+        - Content-Type
+        - Authorization
+  environment:
+    SECRETS_ID: wellnessbuddy/api/prod
+  iam:
+    role:
+      statements:
+        - Effect: Allow
+          Action:
+            - secretsmanager:GetSecretValue
+          Resource:
+            - arn:aws:secretsmanager:${self:provider.region}:*:secret:wellnessbuddy/api/prod-*
+
+functions:
+  api:
+    handler: src/lambda.handler
+    events:
+      - httpApi:
+          method: ANY
+          path: /{proxy+}
+
+package:
+  individually: false
+  patterns:
+    - '!node_modules/.cache/**'
+    - 'wellness-buddy-openapi.yaml'
+
+plugins:
+  - serverless-offline

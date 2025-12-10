@@ -98,7 +98,7 @@
       "Properties": {
         "Code": {
           "S3Bucket": "serverless-framework-deployments-us-east-1-e6a6c07a-db6a",
-          "S3Key": "serverless/wellness-buddy-api/dev/1765345604531-2025-12-10T05:46:44.531Z/wellness-buddy-api.zip"
+          "S3Key": "serverless/wellness-buddy-api/dev/1765347867551-2025-12-10T06:24:27.551Z/wellness-buddy-api.zip"
         },
         "Handler": "src/lambda.handler",
         "Runtime": "nodejs20.x",
@@ -121,14 +121,14 @@
         "ApiLogGroup"
       ]
     },
-    "ApiLambdaVersioniDg23XtufCVxnz4xV1qjAaMW5dcCKaU9mUgio2gao": {
+    "ApiLambdaVersionVZa6zqJEd0QNT8TcMMvUvG3PGtF6YYNcNEnWwhnsOg": {
       "Type": "AWS::Lambda::Version",
       "DeletionPolicy": "Retain",
       "Properties": {
         "FunctionName": {
           "Ref": "ApiLambdaFunction"
         },
-        "CodeSha256": "EKS+OPBCL9nuG5lCdQgkUCevNtatqXdSmJDljrDhU2s="
+        "CodeSha256": "8EpYjxG06pepsq6C9KNmnqQ+uTOcmjyG+06knLMDnPc="
       }
     },
     "HttpApi": {
@@ -255,7 +255,7 @@
     "ApiLambdaFunctionQualifiedArn": {
       "Description": "Current Lambda function version",
       "Value": {
-        "Ref": "ApiLambdaVersioniDg23XtufCVxnz4xV1qjAaMW5dcCKaU9mUgio2gao"
+        "Ref": "ApiLambdaVersionVZa6zqJEd0QNT8TcMMvUvG3PGtF6YYNcNEnWwhnsOg"
       },
       "Export": {
         "Name": "sls-wellness-buddy-api-dev-ApiLambdaFunctionQualifiedArn"

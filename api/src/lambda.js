@@ -95,6 +95,10 @@ async function loadSecretsOnce() {
       // Never throw on cold start; just log the error.
       // eslint-disable-next-line no-console
       console.error('Failed to load secrets from AWS Secrets Manager:', err);
+
+      // If loading secrets failed (e.g. due to invalid JSON), allow a
+      // subsequent invocation to retry by clearing the cached promise.
+      secretsLoadedPromise = null;
     }
   })();
 

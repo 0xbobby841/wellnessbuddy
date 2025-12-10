@@ -1,7 +1,7 @@
 'use strict';
 
 const express = require('express');
-const { supabase } = require('./supabaseClient');
+const { getSupabase } = require('./supabaseClient');
 const { requireAuth } = require('./authMiddleware');
 
 const router = express.Router();
@@ -9,6 +9,7 @@ const router = express.Router();
 // Public: GET /legal/templates
 router.get('/legal/templates', async (req, res) => {
   try {
+    const supabase = getSupabase();
     if (!supabase) {
       return res.status(500).json({ error: { code: 'SUPABASE_NOT_INITIALIZED', message: 'Supabase client not initialized' } });
     }
@@ -37,6 +38,7 @@ router.get('/legal/templates', async (req, res) => {
 // Auth-only: POST /legal/templates (not used by client in this prototype)
 router.post('/contract-templates', requireAuth, async (req, res) => {
   try {
+    const supabase = getSupabase();
     if (!supabase) {
       return res.status(500).json({ message: 'Supabase client not initialized' });
     }
@@ -62,6 +64,7 @@ router.post('/contract-templates', requireAuth, async (req, res) => {
 // Public: GET /legal/templates/:templateId
 router.get('/legal/templates/:templateId', async (req, res) => {
   try {
+    const supabase = getSupabase();
     if (!supabase) {
       return res.status(500).json({ error: { code: 'SUPABASE_NOT_INITIALIZED', message: 'Supabase client not initialized' } });
     }
@@ -87,6 +90,7 @@ router.get('/legal/templates/:templateId', async (req, res) => {
 // PATCH /contract-templates/:templateId
 router.patch('/contract-templates/:templateId', requireAuth, async (req, res) => {
   try {
+    const supabase = getSupabase();
     if (!supabase) {
       return res.status(500).json({ message: 'Supabase client not initialized' });
     }
@@ -114,6 +118,7 @@ router.patch('/contract-templates/:templateId', requireAuth, async (req, res) =>
 // DELETE /contract-templates/:templateId
 router.delete('/contract-templates/:templateId', requireAuth, async (req, res) => {
   try {
+    const supabase = getSupabase();
     if (!supabase) {
       return res.status(500).json({ message: 'Supabase client not initialized' });
     }

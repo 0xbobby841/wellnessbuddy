@@ -1,7 +1,7 @@
 'use strict';
 
 const express = require('express');
-const { supabase } = require('./supabaseClient');
+const { getSupabase } = require('./supabaseClient');
 const { requireAuth } = require('./authMiddleware');
 
 const router = express.Router();
@@ -9,6 +9,7 @@ const router = express.Router();
 // GET /expenses - current user's expenses, optional month filter (YYYY-MM)
 router.get('/expenses', requireAuth, async (req, res) => {
   try {
+    const supabase = getSupabase();
     if (!supabase) {
       return res.status(500).json({ error: { code: 'SUPABASE_NOT_INITIALIZED', message: 'Supabase client not initialized' } });
     }
@@ -56,6 +57,7 @@ router.get('/expenses', requireAuth, async (req, res) => {
 // POST /expenses - create expense for current user
 router.post('/expenses', requireAuth, async (req, res) => {
   try {
+    const supabase = getSupabase();
     if (!supabase) {
       return res.status(500).json({ message: 'Supabase client not initialized' });
     }
@@ -109,6 +111,7 @@ router.post('/expenses', requireAuth, async (req, res) => {
 // GET /expenses/:expenseId
 router.get('/expenses/:expenseId', requireAuth, async (req, res) => {
   try {
+    const supabase = getSupabase();
     if (!supabase) {
       return res.status(500).json({ message: 'Supabase client not initialized' });
     }
@@ -134,6 +137,7 @@ router.get('/expenses/:expenseId', requireAuth, async (req, res) => {
 // PATCH /expenses/:expenseId
 router.patch('/expenses/:expenseId', requireAuth, async (req, res) => {
   try {
+    const supabase = getSupabase();
     if (!supabase) {
       return res.status(500).json({ message: 'Supabase client not initialized' });
     }
@@ -161,6 +165,7 @@ router.patch('/expenses/:expenseId', requireAuth, async (req, res) => {
 // DELETE /expenses/:expenseId
 router.delete('/expenses/:expenseId', requireAuth, async (req, res) => {
   try {
+    const supabase = getSupabase();
     if (!supabase) {
       return res.status(500).json({ message: 'Supabase client not initialized' });
     }

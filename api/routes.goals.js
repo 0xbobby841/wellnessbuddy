@@ -1,7 +1,7 @@
 'use strict';
 
 const express = require('express');
-const { supabase } = require('./supabaseClient');
+const { getSupabase } = require('./supabaseClient');
 const { requireAuth } = require('./authMiddleware');
 
 const router = express.Router();
@@ -9,6 +9,7 @@ const router = express.Router();
 // GET /goals - current user's goals
 router.get('/goals', requireAuth, async (req, res) => {
   try {
+    const supabase = getSupabase();
     if (!supabase) {
       return res.status(500).json({ error: { code: 'SUPABASE_NOT_INITIALIZED', message: 'Supabase client not initialized' } });
     }
@@ -35,6 +36,7 @@ router.get('/goals', requireAuth, async (req, res) => {
 // POST /goals - create goal for current user
 router.post('/goals', requireAuth, async (req, res) => {
   try {
+    const supabase = getSupabase();
     if (!supabase) {
       return res.status(500).json({ message: 'Supabase client not initialized' });
     }
@@ -67,6 +69,7 @@ router.post('/goals', requireAuth, async (req, res) => {
 // GET /goals/:goalId - current user's specific goal
 router.get('/goals/:goalId', requireAuth, async (req, res) => {
   try {
+    const supabase = getSupabase();
     if (!supabase) {
       return res.status(500).json({ error: { code: 'SUPABASE_NOT_INITIALIZED', message: 'Supabase client not initialized' } });
     }
@@ -98,6 +101,7 @@ router.get('/goals/:goalId', requireAuth, async (req, res) => {
 // PUT /goals/:goalId - update current user's goal
 router.put('/goals/:goalId', requireAuth, async (req, res) => {
   try {
+    const supabase = getSupabase();
     if (!supabase) {
       return res.status(500).json({ message: 'Supabase client not initialized' });
     }
@@ -136,6 +140,7 @@ router.put('/goals/:goalId', requireAuth, async (req, res) => {
 // DELETE /goals/:goalId - null out related expenses.goal_id, then delete goal if owned by user
 router.delete('/goals/:goalId', requireAuth, async (req, res) => {
   try {
+    const supabase = getSupabase();
     if (!supabase) {
       return res.status(500).json({ message: 'Supabase client not initialized' });
     }

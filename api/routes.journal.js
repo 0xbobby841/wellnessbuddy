@@ -1,7 +1,7 @@
 'use strict';
 
 const express = require('express');
-const { supabase } = require('./supabaseClient');
+const { getSupabase } = require('./supabaseClient');
 const { requireAuth } = require('./authMiddleware');
 
 const router = express.Router();
@@ -9,6 +9,7 @@ const router = express.Router();
 // GET /journal - current user's journal entries, optional type filter (journal|workout)
 router.get('/journal', requireAuth, async (req, res) => {
   try {
+    const supabase = getSupabase();
     if (!supabase) {
       return res.status(500).json({ message: 'Supabase client not initialized' });
     }
@@ -45,6 +46,7 @@ router.get('/journal', requireAuth, async (req, res) => {
 // POST /journal - create entry for current user
 router.post('/journal', requireAuth, async (req, res) => {
   try {
+    const supabase = getSupabase();
     if (!supabase) {
       return res.status(500).json({ message: 'Supabase client not initialized' });
     }
@@ -100,6 +102,7 @@ router.post('/journal', requireAuth, async (req, res) => {
 // GET /journal/:entryId - specific entry for current user
 router.get('/journal/:entryId', requireAuth, async (req, res) => {
   try {
+    const supabase = getSupabase();
     if (!supabase) {
       return res.status(500).json({ message: 'Supabase client not initialized' });
     }
@@ -131,6 +134,7 @@ router.get('/journal/:entryId', requireAuth, async (req, res) => {
 // PUT /journal/:entryId - update entry for current user
 router.put('/journal/:entryId', requireAuth, async (req, res) => {
   try {
+    const supabase = getSupabase();
     if (!supabase) {
       return res.status(500).json({ message: 'Supabase client not initialized' });
     }
@@ -170,6 +174,7 @@ router.put('/journal/:entryId', requireAuth, async (req, res) => {
 // DELETE /journal/:entryId - delete entry for current user
 router.delete('/journal/:entryId', requireAuth, async (req, res) => {
   try {
+    const supabase = getSupabase();
     if (!supabase) {
       return res.status(500).json({ message: 'Supabase client not initialized' });
     }

@@ -6,30 +6,28 @@ const { requireAuth } = require('./authMiddleware');
 
 const router = express.Router();
 
-// GET /journal-entries
-router.get('/journal-entries', requireAuth, async (req, res) => {
+// GET /journal - current user's journal entries, optional type filter (journal|workout)
+router.get('/journal', requireAuth, async (req, res) => {
   try {
     if (!supabase) {
       return res.status(500).json({ message: 'Supabase client not initialized' });
     }
 
-    const { userId, goalId, fromDate, toDate } = req.query;
-    let query = supabase.from('journal_entries').select('*');
-
-    if (userId) {
-      query = query.eq('user_id', userId);
+    const userId = req.user && req.user.id;
+    if (!userId) {
+      return res.status(401).json({ error: { code: 'UNAUTHENTICATED', message: 'User not authenticated' } });
     }
 
-    if (goalId) {
-      query = query.eq('goal_id', goalId);
-    }
+    const { type } = req.query;
 
-    if (fromDate) {
-      query = query.gte('entry_date', fromDate);
-    }
+    let query = supabase
+      .from('journal_entries')
+      .select('*')
+      .eq('user_id', userId)
+      .order('entry_date', { ascending: false });
 
-    if (toDate) {
-      query = query.lte('entry_date', toDate);
+    if (type) {
+      query = query.eq('entry_type', type);
     }
 
     const { data, error } = await query;
@@ -38,20 +36,50 @@ router.get('/journal-entries', requireAuth, async (req, res) => {
       return res.status(500).json({ message: error.message });
     }
 
-    return res.json(data || []);
+    return res.json({ data: data || [] });
   } catch (err) {
     return res.status(500).json({ message: err.message || 'Internal server error' });
   }
 });
 
-// POST /journal-entries
-router.post('/journal-entries', requireAuth, async (req, res) => {
+// POST /journal - create entry for current user
+router.post('/journal', requireAuth, async (req, res) => {
   try {
     if (!supabase) {
       return res.status(500).json({ message: 'Supabase client not initialized' });
     }
 
-    const payload = req.body;
+    const userId = req.user && req.user.id;
+    if (!userId) {
+      return res.status(401).json({ error: { code: 'UNAUTHENTICATED', message: 'User not authenticated' } });
+    }
+
+    const { goal_id, entry_date, content, mood_rating, entry_type } = req.body;
+
+    if (!goal_id || !entry_date || !content) {
+      return res.status(400).json({ error: { code: 'BAD_REQUEST', message: 'goal_id, entry_date, and content are required' } });
+    }
+
+    // Ensure goal belongs to current user
+    const { data: goal, error: goalError } = await supabase
+      .from('goals')
+      .select('goal_id')
+      .eq('goal_id', goal_id)
+      .eq('user_id', userId)
+      .single();
+
+    if (goalError || !goal) {
+      return res.status(400).json({ error: { code: 'INVALID_GOAL', message: 'Goal does not belong to current user' } });
+    }
+
+    const payload = {
+      user_id: userId,
+      goal_id,
+      entry_date,
+      content,
+      mood_rating: mood_rating ?? null,
+      entry_type: entry_type || 'journal',
+    };
 
     const { data, error } = await supabase
       .from('journal_entries')
@@ -63,17 +91,22 @@ router.post('/journal-entries', requireAuth, async (req, res) => {
       return res.status(400).json({ message: error.message });
     }
 
-    return res.status(201).json(data);
+    return res.status(201).json({ data });
   } catch (err) {
     return res.status(500).json({ message: err.message || 'Internal server error' });
   }
 });
 
-// GET /journal-entries/:entryId
-router.get('/journal-entries/:entryId', requireAuth, async (req, res) => {
+// GET /journal/:entryId - specific entry for current user
+router.get('/journal/:entryId', requireAuth, async (req, res) => {
   try {
     if (!supabase) {
       return res.status(500).json({ message: 'Supabase client not initialized' });
+    }
+
+    const userId = req.user && req.user.id;
+    if (!userId) {
+      return res.status(401).json({ error: { code: 'UNAUTHENTICATED', message: 'User not authenticated' } });
     }
 
     const { entryId } = req.params;
@@ -82,32 +115,45 @@ router.get('/journal-entries/:entryId', requireAuth, async (req, res) => {
       .from('journal_entries')
       .select('*')
       .eq('entry_id', entryId)
+      .eq('user_id', userId)
       .single();
 
     if (error) {
       return res.status(404).json({ message: 'Journal entry not found' });
     }
 
-    return res.json(data);
+    return res.json({ data });
   } catch (err) {
     return res.status(500).json({ message: err.message || 'Internal server error' });
   }
 });
 
-// PATCH /journal-entries/:entryId
-router.patch('/journal-entries/:entryId', requireAuth, async (req, res) => {
+// PUT /journal/:entryId - update entry for current user
+router.put('/journal/:entryId', requireAuth, async (req, res) => {
   try {
     if (!supabase) {
       return res.status(500).json({ message: 'Supabase client not initialized' });
     }
 
+    const userId = req.user && req.user.id;
+    if (!userId) {
+      return res.status(401).json({ error: { code: 'UNAUTHENTICATED', message: 'User not authenticated' } });
+    }
+
     const { entryId } = req.params;
-    const payload = req.body;
+    const { entry_date, content, mood_rating, entry_type } = req.body;
+    const payload = {
+      ...(entry_date && { entry_date }),
+      ...(content && { content }),
+      ...(mood_rating !== undefined && { mood_rating }),
+      ...(entry_type && { entry_type }),
+    };
 
     const { data, error } = await supabase
       .from('journal_entries')
       .update(payload)
       .eq('entry_id', entryId)
+      .eq('user_id', userId)
       .select()
       .single();
 
@@ -115,17 +161,22 @@ router.patch('/journal-entries/:entryId', requireAuth, async (req, res) => {
       return res.status(404).json({ message: 'Journal entry not found' });
     }
 
-    return res.json(data);
+    return res.json({ data });
   } catch (err) {
     return res.status(500).json({ message: err.message || 'Internal server error' });
   }
 });
 
-// DELETE /journal-entries/:entryId
-router.delete('/journal-entries/:entryId', requireAuth, async (req, res) => {
+// DELETE /journal/:entryId - delete entry for current user
+router.delete('/journal/:entryId', requireAuth, async (req, res) => {
   try {
     if (!supabase) {
       return res.status(500).json({ message: 'Supabase client not initialized' });
+    }
+
+    const userId = req.user && req.user.id;
+    if (!userId) {
+      return res.status(401).json({ error: { code: 'UNAUTHENTICATED', message: 'User not authenticated' } });
     }
 
     const { entryId } = req.params;
@@ -133,7 +184,8 @@ router.delete('/journal-entries/:entryId', requireAuth, async (req, res) => {
     const { error } = await supabase
       .from('journal_entries')
       .delete()
-      .eq('entry_id', entryId);
+      .eq('entry_id', entryId)
+      .eq('user_id', userId);
 
     if (error) {
       return res.status(500).json({ message: error.message });

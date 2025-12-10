@@ -6,6 +6,7 @@ import JournalPage from './pages/JournalPage.jsx';
 import FinancePage from './pages/FinancePage.jsx';
 import LegalTemplatesPage from './pages/LegalTemplatesPage.jsx';
 import LegalFaqsPage from './pages/LegalFaqsPage.jsx';
+import TemplateDetailPage from './pages/TemplateDetailPage.jsx';
 import ClubsPage from './pages/ClubsPage.jsx';
 import AiSupportPage from './pages/AiSupportPage.jsx';
 import GoalsPage from './pages/GoalsPage.jsx';
@@ -26,8 +27,8 @@ function Layout({ children }) {
           <Link to="/workouts">Workouts</Link> |{' '}
           <Link to="/journal">Health Journal</Link> |{' '}
           <Link to="/finance">Finances</Link> |{' '}
-          <Link to="/legal/templates">Legal Templates</Link> |{' '}
-          <Link to="/legal/faqs">Legal FAQs</Link> |{' '}
+          <Link to="/legal/templates">Contract Templates</Link> |{' '}
+          <Link to="/legal/faq">Legal FAQs</Link> |{' '}
           <Link to="/clubs">Clubs</Link> |{' '}
           <Link to="/ai">AI Support</Link> |{' '}
           <Link to="/goals">Goals</Link> |{' '}
@@ -57,7 +58,7 @@ function App() {
           <Routes>
             {/* Public routes */}
             <Route path="/" element={<HomePage />} />
-            <Route path="/legal/faqs" element={<LegalFaqsPage />} />
+            <Route path="/legal/faq" element={<LegalFaqsPage />} />
             <Route path="/login" element={<LoginPage />} />
             <Route path="/verify-otp" element={<VerifyOtpPage />} />
 
@@ -91,6 +92,14 @@ function App() {
               element={(
                 <ProtectedRoute>
                   <LegalTemplatesPage />
+                </ProtectedRoute>
+              )}
+            />
+            <Route
+              path="/legal/templates/:id"
+              element={(
+                <ProtectedRoute>
+                  <TemplateDetailPage />
                 </ProtectedRoute>
               )}
             />

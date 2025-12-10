@@ -1,11 +1,21 @@
+import { supabase } from './supabaseClient.js';
+
 const API_BASE = import.meta.env.VITE_API_BASE || 'http://localhost:5000';
 
 async function request(path, options = {}) {
   const url = `${API_BASE}${path}`;
 
+  // Attach Supabase access token if available so backend can authenticate the user.
+  const {
+    data: { session },
+  } = await supabase.auth.getSession();
+
+  const authHeader = session?.access_token ? { Authorization: `Bearer ${session.access_token}` } : {};
+
   const res = await fetch(url, {
     headers: {
       'Content-Type': 'application/json',
+      ...authHeader,
       ...(options.headers || {}),
     },
     ...options,

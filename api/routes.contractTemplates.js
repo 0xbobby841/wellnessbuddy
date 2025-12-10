@@ -6,15 +6,17 @@ const { requireAuth } = require('./authMiddleware');
 
 const router = express.Router();
 
-// GET /contract-templates
-router.get('/contract-templates', requireAuth, async (req, res) => {
+// Public: GET /legal/templates
+router.get('/legal/templates', async (req, res) => {
   try {
     if (!supabase) {
-      return res.status(500).json({ message: 'Supabase client not initialized' });
+      return res.status(500).json({ error: { code: 'SUPABASE_NOT_INITIALIZED', message: 'Supabase client not initialized' } });
     }
 
     const { category } = req.query;
-    let query = supabase.from('contract_templates').select('*');
+    let query = supabase
+      .from('contract_templates')
+      .select('template_id, title, category, description, file_url');
 
     if (category) {
       query = query.eq('category', category);
@@ -23,16 +25,16 @@ router.get('/contract-templates', requireAuth, async (req, res) => {
     const { data, error } = await query;
 
     if (error) {
-      return res.status(500).json({ message: error.message });
+      return res.status(500).json({ error: { code: 'DB_ERROR', message: error.message } });
     }
 
-    return res.json(data || []);
+    return res.json({ data: data || [] });
   } catch (err) {
-    return res.status(500).json({ message: err.message || 'Internal server error' });
+    return res.status(500).json({ error: { code: 'INTERNAL_SERVER_ERROR', message: err.message || 'Internal server error' } });
   }
 });
 
-// POST /contract-templates
+// Auth-only: POST /legal/templates (not used by client in this prototype)
 router.post('/contract-templates', requireAuth, async (req, res) => {
   try {
     if (!supabase) {
@@ -57,28 +59,28 @@ router.post('/contract-templates', requireAuth, async (req, res) => {
   }
 });
 
-// GET /contract-templates/:templateId
-router.get('/contract-templates/:templateId', requireAuth, async (req, res) => {
+// Public: GET /legal/templates/:templateId
+router.get('/legal/templates/:templateId', async (req, res) => {
   try {
     if (!supabase) {
-      return res.status(500).json({ message: 'Supabase client not initialized' });
+      return res.status(500).json({ error: { code: 'SUPABASE_NOT_INITIALIZED', message: 'Supabase client not initialized' } });
     }
 
     const { templateId } = req.params;
 
     const { data, error } = await supabase
       .from('contract_templates')
-      .select('*')
+      .select('template_id, title, category, description, file_url')
       .eq('template_id', templateId)
       .single();
 
     if (error) {
-      return res.status(404).json({ message: 'Template not found' });
+      return res.status(404).json({ error: { code: 'NOT_FOUND', message: 'Template not found' } });
     }
 
-    return res.json(data);
+    return res.json({ data });
   } catch (err) {
-    return res.status(500).json({ message: err.message || 'Internal server error' });
+    return res.status(500).json({ error: { code: 'INTERNAL_SERVER_ERROR', message: err.message || 'Internal server error' } });
   }
 });
 
